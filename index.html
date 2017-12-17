@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Connect X</title>
+	<link rel="stylesheet" href="css/index.css">
+</head>
+
+<body onload="startGame()">
+
+<canvas id="game" ></canvas>
+<p id="log"></p>
+
+</body>
+
+<script src="js/calculations.js"></script>
+<script src="js/gamePieces.js"></script>
+<script src="scenes/_default_scene.js"></script>
+<script src="js/GLOBALS.js"></script>
+<script>
+	function startGame() {
+		myBlock = new block( 100, 50, "", 100, 100, "image" );
+
+        GAME_STATE.change_scene( SCENES.DEFAULT_SCENE );
+
+		myGameArea.start( );
+	}
+
+	var myGameArea = {
+	    canvas : document.getElementById("game"),
+
+	    start : function() {
+	    	this.canvas.width = g_width;			// width set in GLOBALS.js
+	    	this.canvas.height = g_height;		// height set in GLOBALS.js
+	        this.context = this.canvas.getContext("2d");
+	        this.interval = setInterval( _MAIN_GAME_LOOP, g_fps );
+
+        	//canvas event listeners
+	        window.addEventListener('keydown', function(e) {
+	        	//send the keyup event to the active scene
+	        	GAME_STATE.ACTIVE_SCENE.button_press( e );	        	
+	        })
+
+	        window.addEventListener('keyup', function( e ){
+	        	//send the keyup event to the active scene
+	        	//GAME_STATE.ACTIVE_SCENE.button_press( e );
+	        })
+
+	        window.addEventListener('click', function( e ) {
+	        	//send the click event to the active scene
+	        	GAME_STATE.ACTIVE_SCENE.clicked( e );
+	        })
+	    },
+
+	    clear : function() {
+	    	this.context.clearRect( 0, 0, this.canvas.width, this.canvas.height );
+	    },
+
+	    // Add functions here that must interact with the game area canvas e.g. collisions with the canvas bounds
+	    // global clicks, etc. 
+	}
+
+
+	function _MAIN_GAME_LOOP() {
+		myGameArea.clear();
+
+		if ( !GAME_STATE.ACTIVE_SCENE.scene_ready ) {
+			GAME_STATE.ACTIVE_SCENE.setup();
+		}
+
+		GAME_STATE.ACTIVE_SCENE.run();
+	}
+
+	var dbgr = {
+		ele : document.getElementById("log"),
+		add : function(msg) {
+			//console.log("working");
+			this.ele.innerHTML = msg + "<br>" + this.ele.innerHTML;
+		}
+	}
+
+</script>
+</body>
+</html>
